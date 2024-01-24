@@ -8,10 +8,12 @@ import pandas as pd
 import numpy as np
 
 from iblatlas.atlas import AllenAtlas
-import ephys_alignment_gui.ColorBar as cb
+
 from ephys_alignment_gui.ephys_alignment import EphysAlignment
-from ephys_alignment_gui.AdaptedAxisItem import replace_axis
-from ephys_alignment_gui.qrangeslider import QRangeSlider
+from ephys_alignment_gui.plot_elements import replace_axis
+from ephys_alignment_gui.plot_elements import QRangeSlider
+from ephys_alignment_gui.plot_elements import ColorBar
+
 from one.remote import aws
 from one.api import ONE
 from pathlib import Path

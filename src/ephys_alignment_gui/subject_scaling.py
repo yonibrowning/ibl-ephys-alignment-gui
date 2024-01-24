@@ -1,10 +1,10 @@
 import pyqtgraph as pg
 from PyQt5 import QtGui, QtWidgets
 import numpy as np
-import ephys_alignment_gui.ColorBar as cb
 
 from ephys_alignment_gui.ephys_alignment import EphysAlignment
-from ephys_alignment_gui.AdaptedAxisItem import replace_axis
+from ephys_alignment_gui.plot_elements import replace_axis
+from ephys_alignment_gui.plot_elements import ColorBar
 from ephys_alignment_gui.probe_geometry import trace_header
 
 pg.setConfigOption('background', 'w')
@@ -189,7 +189,7 @@ class ScalingWindow(QtWidgets.QMainWindow):
 
             scale_regions = np.empty((0, 1))
             scale_factor = data['scale'] - 0.5
-            color_bar = cb.ColorBar('seismic')
+            color_bar = ColorBar('seismic')
             cbar = color_bar.makeColourBar(20, 5, fig_scale_cb, min=0.5, max=1.5,
                                            label='Scale Factor')
             colours = color_bar.map.mapToQColor(scale_factor)

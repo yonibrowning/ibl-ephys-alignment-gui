@@ -3,9 +3,7 @@ import pyqtgraph as pg
 import pyqtgraph.exporters
 import numpy as np
 from random import randrange
-from ephys_alignment_gui.AdaptedAxisItem import replace_axis
-from ephys_alignment_gui.qc.critical_reasons import CriticalInsertionNote
-
+from ephys_alignment_gui.plot_elements import replace_axis
 
 pg.setConfigOption('background', 'w')
 pg.setConfigOption('foreground', 'k')
@@ -144,9 +142,9 @@ class Setup():
         # PROBE PLOTS MENU BAR
         # Define all 2D probe plot options
         # In two stages 1) RMS plots manually, 2) frequency plots in for loop
-        probe_rmsAP = QtWidgets.QAction('rms AP', self, checkable=True, checked=True)
+        probe_rmsAP = QtWidgets.QAction('RMS AP', self, checkable=True, checked=True)
         probe_rmsAP.triggered.connect(lambda: self.plot_probe(self.probe_rms_APdata))
-        probe_rmsLFP = QtWidgets.QAction('rms LFP', self, checkable=True, checked=False)
+        probe_rmsLFP = QtWidgets.QAction('RMS LFP', self, checkable=True, checked=False)
         probe_rmsLFP.triggered.connect(lambda: self.plot_probe(self.probe_rms_LFPdata))
 
         # Initialise with rms of AP probe plot
@@ -283,7 +281,7 @@ class Setup():
         reset_option.setShortcut('Shift+R')
         reset_option.triggered.connect(self.reset_button_pressed)
         # Shortcut to upload final state to Alyx/to local file
-        complete_option = QtWidgets.QAction('Upload', self)
+        complete_option = QtWidgets.QAction('Save', self)
         complete_option.setShortcut('Shift+U')
         if not self.offline:
             complete_option.triggered.connect(self.display_qc_options)

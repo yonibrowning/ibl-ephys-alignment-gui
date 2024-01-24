@@ -13,7 +13,7 @@ import numpy as np
 from random import randrange
 
 import ephys_alignment_gui.plot_data as pd
-import ephys_alignment_gui.ColorBar as cb
+from ephys_alignment_gui.plot_elements import ColorBar
 import ephys_alignment_gui.ephys_gui_setup as ephys_gui
 
 from ephys_alignment_gui.load_data_local import LoadDataLocal
@@ -835,7 +835,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         self.scale_regions = np.empty((0, 1))
         self.scale_factor = self.scale_data['scale']
         scale_factor = self.scale_data['scale'] - 0.5
-        color_bar = cb.ColorBar('seismic')
+        color_bar = ColorBar('seismic')
         cbar = color_bar.makeColourBar(20, 5, self.fig_scale_cb, min=0.5, max=1.5,
                                        label='Scale Factor')
         colours = color_bar.map.mapToQColor(scale_factor)
@@ -902,7 +902,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
             self.fig_slice_layout.addItem(self.fig_slice_hist_alt, 0, 1)
             self.slice_item = self.fig_slice_hist_alt
         else:
-            color_bar = cb.ColorBar('cividis')
+            color_bar = ColorBar('cividis')
             lut = color_bar.getColourMap()
             img.setLookupTable(lut)
 
@@ -992,7 +992,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
             size = data['size'].tolist()
             symbol = data['symbol'].tolist()
 
-            color_bar = cb.ColorBar(data['cmap'])
+            color_bar = ColorBar(data['cmap'])
             cbar = color_bar.makeColourBar(20, 5, self.fig_img_cb, min=np.min(data['levels'][0]),
                                            max=np.max(data['levels'][1]), label=data['title'])
             self.fig_img_cb.addItem(cbar)
@@ -1078,7 +1078,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
             self.probe_plots = []
             self.probe_cbars = []
             self.probe_bounds = []
-            color_bar = cb.ColorBar(data['cmap'])
+            color_bar = ColorBar(data['cmap'])
             lut = color_bar.getColourMap()
             for img, scale, offset in zip(data['img'], data['scale'], data['offset']):
                 image = pg.ImageItem()
@@ -1140,7 +1140,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
             image.setTransform(QtGui.QTransform(*transform))
             cmap = data.get('cmap', [])
             if cmap:
-                color_bar = cb.ColorBar(data['cmap'])
+                color_bar = ColorBar(data['cmap'])
                 lut = color_bar.getColourMap()
                 image.setLookupTable(lut)
                 image.setLevels((data['levels'][0], data['levels'][1]))

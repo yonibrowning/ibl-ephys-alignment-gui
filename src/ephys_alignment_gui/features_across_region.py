@@ -8,10 +8,11 @@ import pandas as pd
 import numpy as np
 
 from iblatlas.atlas import AllenAtlas
-import ephys_alignment_gui.ColorBar as cb
+from ephys_alignment_gui.plot_elements import ColorBar
 from ephys_alignment_gui.ephys_alignment import EphysAlignment
-from ephys_alignment_gui.AdaptedAxisItem import replace_axis
-from ephys_alignment_gui.qrangeslider import QRangeSlider
+from ephys_alignment_gui.plot_elements import replace_axis
+from ephys_alignment_gui.plot_elements import QRangeSlider
+
 from one.remote import aws
 from one.api import ONE
 from pathlib import Path
@@ -524,7 +525,7 @@ class RegionFeatureWindow(QtWidgets.QMainWindow):
 
         fig_probe.clear()
         fig_cbar.clear()
-        color_bar = cb.ColorBar(data['cmap'])
+        color_bar = ColorBar(data['cmap'])
         lut = color_bar.getColourMap()
         levels = self.levels if self.normalise else data['levels']
         for img, scale, move in zip(data['img'], data['scale'], data['offset']):

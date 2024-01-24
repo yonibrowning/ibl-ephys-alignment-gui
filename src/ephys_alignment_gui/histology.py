@@ -9,7 +9,7 @@ import one.alf.io as alfio
 import iblatlas.atlas as atlas
 
 #from ibllib.ephys.spikes import probes_description as extract_probes
-from ephys_alignment_gui.qc import base
+#from ephys_alignment_gui.qc import base
 
 from ephys_alignment_gui.utils import fcn_cosine
 from ephys_alignment_gui.probe_geometry import TIP_SIZE_UM, trace_header
