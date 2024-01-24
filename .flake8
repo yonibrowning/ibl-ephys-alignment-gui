@@ -4,8 +4,4 @@ ignore = W504
 exclude =
     .git,
     __pycache__,
-    __init__.py,
-    data_exploration_gui/
-    launch_phy/
-    histology/
-    qt_matplotlib.py
+    build

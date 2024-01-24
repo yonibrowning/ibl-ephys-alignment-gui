@@ -1,5 +1,0 @@
-easyqc
-ibllib
-pyqtgraph
-simpleITK
-pyqt5

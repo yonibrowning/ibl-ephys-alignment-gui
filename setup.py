@@ -1,3 +1,8 @@
+from setuptools import setup
+
+if __name__ == "__main__":
+    setup()
+
 from setuptools import setup, find_packages
 
 with open('requirements.txt') as f:
