@@ -14,7 +14,7 @@ pg.setConfigOption('foreground', 'k')
 class Setup():
     def init_layout(self, main_window, offline=False):
         self.resize(1600, 800)
-        self.setWindowTitle('Electrophysiology Atlas')
+        self.setWindowTitle('IBL Ephys Alignment GUI')
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.offline = offline
         main_widget = QtWidgets.QWidget()
@@ -71,9 +71,9 @@ class Setup():
         img_fr.triggered.connect(lambda: self.plot_image(self.img_fr_data))
         img_corr = QtWidgets.QAction('Correlation', self, checkable=True, checked=False)
         img_corr.triggered.connect(lambda: self.plot_image(self.img_corr_data))
-        img_rmsAP = QtWidgets.QAction('rms AP', self, checkable=True, checked=False)
+        img_rmsAP = QtWidgets.QAction('RMS AP', self, checkable=True, checked=False)
         img_rmsAP.triggered.connect(lambda: self.plot_image(self.img_rms_APdata))
-        img_rmsLFP = QtWidgets.QAction('rms LFP', self, checkable=True, checked=False)
+        img_rmsLFP = QtWidgets.QAction('RMS LFP', self, checkable=True, checked=False)
         img_rmsLFP.triggered.connect(lambda: self.plot_image(self.img_rms_LFPdata))
         img_LFP = QtWidgets.QAction('LFP Spectrum', self, checkable=True, checked=False)
         img_LFP.triggered.connect(lambda: self.plot_image(self.img_lfp_data))
@@ -456,7 +456,7 @@ class Setup():
         self.reset_button = QtWidgets.QPushButton('Reset')
         self.reset_button.clicked.connect(self.reset_button_pressed)
         # Button to upload final state to Alyx/ to local file
-        self.complete_button = QtWidgets.QPushButton('Upload')
+        self.complete_button = QtWidgets.QPushButton('Save')
         if not self.offline:
             self.complete_button.clicked.connect(self.display_qc_options)
         else:

@@ -1728,7 +1728,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         if not self.histology_exists:
             return
 
-        upload = QtWidgets.QMessageBox.question(self, '', "Upload alignment?",
+        upload = QtWidgets.QMessageBox.question(self, '', "Save alignment?",
                                                 QtWidgets.QMessageBox.Yes |
                                                 QtWidgets.QMessageBox.No)
 
@@ -1767,7 +1767,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         Triggered when complete button or Shift+F key pressed. Uploads final channel locations to
         json file
         """
-        upload = QtWidgets.QMessageBox.question(self, '', "Upload alignment?",
+        upload = QtWidgets.QMessageBox.question(self, '', "Save alignment?",
                                                 QtWidgets.QMessageBox.Yes |
                                                 QtWidgets.QMessageBox.No)
 
