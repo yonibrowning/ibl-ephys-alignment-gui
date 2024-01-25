@@ -14,13 +14,8 @@ classifiers = [
     "Programming Language :: Python :: 3"
 ]
 readme = "README.md"
-dynamic = ["version"]
 
-dependencies = [
-    'iblatlas',
-    'PyQt5',
-    'pyqtgraph'
-]
+dynamic = ["dependencies", "version"]
 
 [project.optional-dependencies]
 dev = [
