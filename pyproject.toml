@@ -33,6 +33,7 @@ launch = 'ephys_alignment_gui.launch_gui:main'
 where = ["src"]
 
 [tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
 version = {attr = "ephys_alignment_gui.__version__"}
 
 [tool.black]
