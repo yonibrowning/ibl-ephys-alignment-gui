@@ -28,6 +28,7 @@ class LoadDataLocal:
         self.sess_path = None
         self.shank_idx = 0
         self.n_shanks = 1
+        self.output_directory = None
 
     def get_info(self, folder_path):
         """
@@ -243,7 +244,7 @@ class LoadDataLocal:
         chan_loc_filename = 'channel_locations.json' if self.n_shanks == 1 else \
             f'channel_locations_shank{self.shank_idx + 1}.json'
 
-        with open(self.folder_path.joinpath(chan_loc_filename), "w") as f:
+        with open(self.output_directory.joinpath(chan_loc_filename), "w") as f:
             json.dump(channel_dict, f, indent=2, separators=(',', ': '))
         original_json = self.alignments
         date = datetime.now().replace(microsecond=0).isoformat()
@@ -255,7 +256,7 @@ class LoadDataLocal:
         # Save the new alignment
         prev_align_filename = 'prev_alignments.json' if self.n_shanks == 1 else \
             f'prev_alignments_shank{self.shank_idx + 1}.json'
-        with open(self.folder_path.joinpath(prev_align_filename), "w") as f:
+        with open(self.output_directory.joinpath(prev_align_filename), "w") as f:
             json.dump(original_json, f, indent=2, separators=(',', ': '))
 
     @staticmethod

@@ -481,16 +481,21 @@ class Setup():
             self.sess_combobox.activated.connect(self.on_session_selected)
         else:
             # If offline mode is True, provide dialog to select local folder that holds data
-            self.folder_line = QtWidgets.QLineEdit()
-            self.folder_button = QtWidgets.QToolButton()
-            self.folder_button.setText('Load Data')
-            self.folder_button.clicked.connect(self.on_folder_selected)
+            self.input_folder_line = QtWidgets.QLineEdit()
+            self.input_folder_button = QtWidgets.QToolButton()
+            self.input_folder_button.setText('Input Directory')
+            self.input_folder_button.clicked.connect(self.on_input_folder_selected)
 
         # Drop down list to select shank
         self.shank_list = QtGui.QStandardItemModel()
         self.shank_combobox = QtWidgets.QComboBox()
         self.shank_combobox.setModel(self.shank_list)
         self.shank_combobox.activated.connect(self.on_shank_selected)
+
+        self.output_folder_line = QtWidgets.QLineEdit()
+        self.output_folder_button = QtWidgets.QToolButton()
+        self.output_folder_button.setText('Output Directory')
+        self.output_folder_button.clicked.connect(self.on_output_folder_selected)
 
         # Arrange interaction features into three different layout groups
         # Group 1
@@ -505,12 +510,15 @@ class Setup():
         self.interaction_layout1 = QtWidgets.QVBoxLayout()
         self.interaction_layout1.addLayout(hlayout1)
         self.interaction_layout1.addLayout(hlayout2)
-        # Group 2
-        self.interaction_layout2 = QtWidgets.QHBoxLayout()
-        self.interaction_layout2.addWidget(self.reset_button)
-        self.interaction_layout2.addWidget(self.complete_button)
 
-        # Group 3 will depend on online/ offline mode
+        # Group 2 -- saving data
+        self.interaction_layout2 = QtWidgets.QHBoxLayout()
+        self.interaction_layout2.addWidget(self.output_folder_button, stretch=1)
+        self.interaction_layout2.addWidget(self.output_folder_line, stretch=2)
+        self.interaction_layout2.addWidget(self.reset_button, stretch=1)
+        self.interaction_layout2.addWidget(self.complete_button, stretch=1)
+
+        # Group 3 -- loading data
         self.interaction_layout3 = QtWidgets.QHBoxLayout()
         if not self.offline:
             self.interaction_layout3.addWidget(self.subj_combobox, stretch=1)
@@ -518,8 +526,8 @@ class Setup():
             self.interaction_layout3.addWidget(self.align_combobox, stretch=2)
             self.interaction_layout3.addWidget(self.data_button, stretch=1)
         else:
-            self.interaction_layout3.addWidget(self.folder_line, stretch=2)
-            self.interaction_layout3.addWidget(self.folder_button, stretch=1)
+            self.interaction_layout3.addWidget(self.input_folder_button, stretch=1)
+            self.interaction_layout3.addWidget(self.input_folder_line, stretch=2)
             self.interaction_layout3.addWidget(self.shank_combobox, stretch=1)
 
         # Pop up dialog for qc results to datajoint, only for online mode

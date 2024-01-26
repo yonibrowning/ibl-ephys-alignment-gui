@@ -55,6 +55,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         self.offline = True
         self.histology_exists = True
         self.data_status = False
+        self.output_directory = None
 
         self.allen = self.loaddata.get_allen_csv()
         self.init_region_lookup(self.allen)
@@ -368,21 +369,17 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         Saves all plots from the GUI into folder
         """
         # make folder to save plots to
-        try:
-            sess_info = (self.loaddata.subj + '_' + str(self.loaddata.date) + '_' +
-                         self.loaddata.probe_label + '_')
-            image_path_overview = self.probe_path.joinpath('GUI_plots')
-            image_path = image_path_overview.joinpath(sess_info[:-1])
-        except Exception:
-            sess_info = ''
-            image_path_overview = self.probe_path.joinpath('GUI_plots')
-            image_path = image_path_overview
+        sess_info = ''
 
         if save_path:
             image_path_overview = Path(save_path)
+        else:
+            if self.loaddata.output_directory == None:
+                self.on_output_folder_selected()
+            image_path_overview = Path(self.loaddata.output_directory)
 
         os.makedirs(image_path_overview, exist_ok=True)
-        os.makedirs(image_path, exist_ok=True)
+        os.makedirs(image_path_overview, exist_ok=True)
         # Reset all axis, put view back to 1 and remove any reference lines
         self.reset_axis_button_pressed()
         self.set_view(view=1, configure=False)
@@ -413,7 +410,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         while plot != start_plot:
             self.set_font(self.fig_img_cb, 'top', ptsize=15, height=ax_height + 15)
             exporter = pg.exporters.ImageExporter(self.fig_data_layout.scene())
-            exporter.export(str(image_path.joinpath(sess_info + 'img_' +
+            exporter.export(str(image_path_overview.joinpath(sess_info + 'img_' +
                                                     self.img_options_group.checkedAction()
                                                     .text() + '.png')))
             self.toggle_plots(self.img_options_group)
@@ -442,7 +439,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         while plot != start_plot:
             self.set_font(self.fig_probe_cb, 'top', ptsize=15, height=ax_height + 15)
             exporter = pg.exporters.ImageExporter(self.fig_data_layout.scene())
-            exporter.export(str(image_path.joinpath(sess_info + 'probe_' +
+            exporter.export(str(image_path_overview.joinpath(sess_info + 'probe_' +
                                                     self.probe_options_group.checkedAction().
                                                     text() + '.png')))
             self.toggle_plots(self.probe_options_group)
@@ -471,7 +468,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         start_plot = self.line_options_group.checkedAction()
         while plot != start_plot:
             exporter = pg.exporters.ImageExporter(self.fig_data_layout.scene())
-            exporter.export(str(image_path.joinpath(sess_info + 'line_' +
+            exporter.export(str(image_path_overview.joinpath(sess_info + 'line_' +
                                                     self.line_options_group.checkedAction().
                                                     text() + '.png')))
             self.toggle_plots(self.line_options_group)
@@ -503,7 +500,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
             self.fig_slice.addItem(self.traj_line)
             slice_name = self.slice_options_group.checkedAction().text()
             exporter = pg.exporters.ImageExporter(self.fig_slice)
-            exporter.export(str(image_path.joinpath(sess_info + 'slice_' + slice_name + '.png')))
+            exporter.export(str(image_path_overview.joinpath(sess_info + 'slice_' + slice_name + '.png')))
             self.toggle_plots(self.slice_options_group)
             plot = self.slice_options_group.checkedAction()
 
@@ -522,7 +519,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
             self.fig_slice.resize(50, self.slice_height)
             exporter = pg.exporters.ImageExporter(self.fig_slice)
             exporter.export(
-                str(image_path.joinpath(sess_info + 'slice_zoom_' + slice_name + '.png')))
+                str(image_path_overview.joinpath(sess_info + 'slice_zoom_' + slice_name + '.png')))
             self.fig_slice.resize(self.slice_width, self.slice_height)
             self.fig_slice.setRange(rect=self.slice_rect)
             self.toggle_plots(self.slice_options_group)
@@ -536,14 +533,14 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         self.set_axis(self.fig_hist_ref, 'bottom', label='original')
         self.set_font(self.fig_hist_ref, 'bottom', ptsize=12)
         exporter = pg.exporters.ImageExporter(self.fig_hist_layout.scene())
-        exporter.export(str(image_path.joinpath(sess_info + 'hist.png')))
+        exporter.export(str(image_path_overview.joinpath(sess_info + 'hist.png')))
         self.set_axis(self.fig_hist_extra_yaxis, 'left', pen=None)
         self.set_font(self.fig_hist, 'bottom', ptsize=8)
         self.set_axis(self.fig_hist, 'bottom', pen='w', label='blank')
         self.set_font(self.fig_hist_ref, 'bottom', ptsize=8)
         self.set_axis(self.fig_hist_ref, 'bottom', pen='w', label='blank')
 
-        make_overview_plot(image_path, sess_info, save_folder=image_path_overview)
+        make_overview_plot(image_path_overview, sess_info, save_folder=image_path_overview)
 
         self.add_lines_points()
 
@@ -1157,17 +1154,35 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
     Interaction functions
     """
 
-    def on_folder_selected(self):
+    def on_input_folder_selected(self):
         """
         Triggered in offline mode when folder button is clicked
         """
         self.data_status = False
-        folder_path = Path(QtWidgets.QFileDialog.getExistingDirectory(None, "Select Folder"))
-        self.folder_line.setText(str(folder_path))
-        self.prev_alignments, shank_options = self.loaddata.get_info(folder_path)
-        self.populate_lists(shank_options, self.shank_list, self.shank_combobox)
-        self.on_shank_selected(0)
-        self.data_button_pressed()
+        folder_path = Path(QtWidgets.QFileDialog.getExistingDirectory(None, "Select Input Directory"))
+
+        if folder_path:
+            self.input_folder_line.setText(str(folder_path))
+            self.prev_alignments, shank_options = self.loaddata.get_info(folder_path)
+            self.populate_lists(shank_options, self.shank_list, self.shank_combobox)
+            self.on_shank_selected(0)
+            self.data_button_pressed()
+            return True
+        else:
+            return False
+
+    def on_output_folder_selected(self):
+        """
+        Triggered in offline mode when folder button is clicked
+        """
+        folder_path = Path(QtWidgets.QFileDialog.getExistingDirectory(None, "Select Output Directory"))
+
+        if folder_path:
+            self.output_folder_line.setText(str(folder_path))
+            self.loaddata.output_directory = folder_path
+            return True
+        else:
+            return False
 
     def on_shank_selected(self, idx):
         """
@@ -1677,64 +1692,21 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
                                 max=self.probe_top + self.probe_extra, padding=self.pad)
         self.update_string()
 
-    def complete_button_pressed(self):
-        """
-        Triggered when complete button or Shift+F key pressed. Uploads final channel locations to
-        Alyx
-        """
-        # If no histology we can't upload alignment
-        if not self.histology_exists:
-            return
-
-        upload = QtWidgets.QMessageBox.question(self, '', "Save alignment?",
-                                                QtWidgets.QMessageBox.Yes |
-                                                QtWidgets.QMessageBox.No)
-
-        if upload == QtWidgets.QMessageBox.Yes:
-            upload_channels = self.loaddata.upload_data(self.xyz_channels)
-            self.loaddata.update_alignments(self.features[self.idx], self.track[self.idx])
-            self.loaddata.get_starting_alignment(0)
-            resolved = self.loaddata.update_qc()
-
-            if upload_channels and resolved == 0:
-                # channels saved alignment not resolved
-                QtWidgets.QMessageBox.information(self, 'Status',
-                                                  ("Channels locations saved to Alyx. "
-                                                   "Alignment not resolved"))
-            if upload_channels and resolved == 1:
-                # channels saved alignment resolved, writen to flatiron
-                QtWidgets.QMessageBox.information(self, 'Status',
-                                                  ("Channel locations saved to Alyx. "
-                                                   "Alignment resolved and channels "
-                                                   "datasets written to flatiron"))
-            if not upload_channels and resolved == 1:
-                # alignment already resolved, save alignment but channels not written
-                QtWidgets.QMessageBox.information(self, 'Status',
-                                                  ("Channel locations not saved to Alyx"
-                                                   " as alignment has already been "
-                                                   "resolved. New user reference lines"
-                                                   " have been saved"))
-        else:
-            pass
-            QtWidgets.QMessageBox.information(self, 'Status', "Channels not saved")
-
     def complete_button_pressed_offline(self):
         """
         Triggered when complete button or Shift+F key pressed. Uploads final channel locations to
         json file
         """
-        upload = QtWidgets.QMessageBox.question(self, '', "Save alignment?",
-                                                QtWidgets.QMessageBox.Yes |
-                                                QtWidgets.QMessageBox.No)
+        if not self.loaddata.output_directory:
+            if not self.on_output_folder_selected():
+                QtWidgets.QMessageBox.information(self, 'Status', "Channels locations not saved")
+                return
 
-        if upload == QtWidgets.QMessageBox.Yes:
-            self.loaddata.upload_data(self.features[self.idx], self.track[self.idx],
-                                      self.xyz_channels)
-            self.loaddata.get_starting_alignment(0)
-            QtWidgets.QMessageBox.information(self, 'Status', "Channels locations saved")
-        else:
-            pass
-            QtWidgets.QMessageBox.warning(self, 'Status', "Channels not saved")
+        self.loaddata.upload_data(self.features[self.idx], self.track[self.idx],
+                                    self.xyz_channels)
+        self.loaddata.get_starting_alignment(0)
+        QtWidgets.QMessageBox.information(self, 'Status', "Channels locations saved")
+
 
     def display_qc_options(self):
 
