@@ -483,24 +483,14 @@ class Setup():
             # If offline mode is True, provide dialog to select local folder that holds data
             self.folder_line = QtWidgets.QLineEdit()
             self.folder_button = QtWidgets.QToolButton()
-            self.folder_button.setText('...')
+            self.folder_button.setText('Load Data')
             self.folder_button.clicked.connect(self.on_folder_selected)
-
-        # Drop down list to choose previous alignments
-        self.align_list = QtGui.QStandardItemModel()
-        self.align_combobox = QtWidgets.QComboBox()
-        self.align_combobox.setModel(self.align_list)
-        self.align_combobox.activated.connect(self.on_alignment_selected)
 
         # Drop down list to select shank
         self.shank_list = QtGui.QStandardItemModel()
         self.shank_combobox = QtWidgets.QComboBox()
         self.shank_combobox.setModel(self.shank_list)
         self.shank_combobox.activated.connect(self.on_shank_selected)
-
-        # Button to get data to display in GUI
-        self.data_button = QtWidgets.QPushButton('Get Data')
-        self.data_button.clicked.connect(self.data_button_pressed)
 
         # Arrange interaction features into three different layout groups
         # Group 1
@@ -531,8 +521,6 @@ class Setup():
             self.interaction_layout3.addWidget(self.folder_line, stretch=2)
             self.interaction_layout3.addWidget(self.folder_button, stretch=1)
             self.interaction_layout3.addWidget(self.shank_combobox, stretch=1)
-            self.interaction_layout3.addWidget(self.align_combobox, stretch=2)
-            self.interaction_layout3.addWidget(self.data_button, stretch=1)
 
         # Pop up dialog for qc results to datajoint, only for online mode
         if not self.offline:

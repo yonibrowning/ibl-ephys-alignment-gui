@@ -11,8 +11,6 @@ from one import alf
 
 import iblatlas.atlas as atlas
 
-from ephys_alignment_gui.load_histology import tif2nrrd
-
 # temporarily add this in for neuropixel course 
 # until figured out fix to problem on win32
 import ssl
@@ -22,7 +20,7 @@ logger = logging.getLogger('ibllib')
 
 class LoadDataLocal:
     def __init__(self):
-        self.brain_atlas = atlas.AllenAtlas(25)
+        self.brain_atlas = None
         self.franklin_atlas = None
         self.folder_path = None
         self.chn_coords = None
@@ -94,6 +92,8 @@ class LoadDataLocal:
 
     def get_data(self):
 
+        self.brain_atlas = atlas.AllenAtlas(hist_path=self.folder_path)
+
         chn_x = np.unique(self.chn_coords_all[:, 0])
         if self.n_shanks > 1:
             shanks = {}
@@ -131,7 +131,6 @@ class LoadDataLocal:
                 sess_notes = f.read()
         else:
             sess_notes = 'No notes for this session'
-
         return self.folder_path, chn_depths, sess_notes, data
 
     def get_allen_csv(self):
@@ -156,24 +155,19 @@ class LoadDataLocal:
         return xyz_picks
 
     def get_slice_images(self, xyz_channels):
-        # First see if the histology file exists before attempting to connect with FlatIron and
-        # download
+        # Load local slice images
 
         path_to_rd_image_nrrd = glob.glob(str(self.folder_path) + '/*RD.nrrd')
-        path_to_rd_image_tif = glob.glob(str(self.folder_path) + '/*RD.tif')
+        
         if path_to_rd_image_nrrd:
             hist_path_rd = Path(path_to_rd_image_nrrd[0])
-        elif path_to_rd_image_tif:
-            hist_path_rd = tif2nrrd(path_to_rd_image_tif[0])
         else:
             hist_path_rd = []
 
         path_to_gr_image_nrrd = glob.glob(str(self.folder_path) + '/*GR.nrrd')
-        path_to_gr_image_tif = glob.glob(str(self.folder_path) + '/*GR.tif')
+
         if path_to_gr_image_nrrd:
             hist_path_gr = Path(path_to_gr_image_nrrd[0])
-        elif path_to_gr_image_tif:
-            hist_path_gr = tif2nrrd(path_to_gr_image_tif[0])
         else:
             hist_path_gr = []
 

@@ -17,10 +17,10 @@ from ephys_alignment_gui.plot_elements import ColorBar
 import ephys_alignment_gui.ephys_gui_setup as ephys_gui
 
 from ephys_alignment_gui.load_data_local import LoadDataLocal
-from ephys_alignment_gui.subject_scaling import ScalingWindow
+from ephys_alignment_gui.windows.subject_scaling import ScalingWindow
 from ephys_alignment_gui.create_overview_plots import make_overview_plot
 
-from ephys_alignment_gui.features_across_region import RegionFeatureWindow
+from ephys_alignment_gui.windows.features_across_region import RegionFeatureWindow
 from ephys_alignment_gui.ephys_alignment import EphysAlignment
 
 import matplotlib.pyplot as mpl  # noqa  # This is needed to make qt show properly :/
@@ -50,24 +50,11 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         self.init_layout(self, offline=offline)
         self.configure = True
         one_mode = 'remote' if remote else 'auto'
-        if not offline and probe_id is None:
-            self.loaddata = LoadData(mode=one_mode)
-            self.populate_lists(self.loaddata.get_subjects(), self.subj_list, self.subj_combobox)
-            self.offline = False
-        elif not offline and probe_id is not None:
-            self.loaddata = LoadData(probe_id=probe_id, one=one, load_histology=histology,
-                                     spike_collection=spike_collection, mode=one_mode)
-            self.current_shank_idx = 0
-            _, self.histology_exists = self.loaddata.get_info(0)
-            self.feature_prev, self.track_prev = self.loaddata.get_starting_alignment(0)
-            self.data_status = False
-            self.data_button_pressed()
-            self.offline = False
-        else:
-            self.loaddata = LoadDataLocal()
-            self.offline = True
-            self.histology_exists = True
-            self.data_status = False
+
+        self.loaddata = LoadDataLocal()
+        self.offline = True
+        self.histology_exists = True
+        self.data_status = False
 
         self.allen = self.loaddata.get_allen_csv()
         self.init_region_lookup(self.allen)
@@ -1170,33 +1157,6 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
     Interaction functions
     """
 
-    def on_subject_selected(self, idx):
-        """
-        Triggered when subject is selected from drop down list options
-        :param idx: index chosen subject (item) in drop down list
-        :type idx: int
-        """
-        self.data_status = False
-        self.sess_list.clear()
-        sessions = self.loaddata.get_sessions(idx)
-        self.populate_lists(sessions, self.sess_list, self.sess_combobox)
-        self.prev_alignments, self.histology_exists = self.loaddata.get_info(0)
-        self.populate_lists(self.prev_alignments, self.align_list, self.align_combobox)
-        self.feature_prev, self.track_prev = self.loaddata.get_starting_alignment(0)
-        # For IBL case at the moment we only using single shank
-        self.current_shank_idx = 0
-
-    def on_session_selected(self, idx):
-        """
-        Triggered when session is selected from drop down list options
-        :param idx: index of chosen session (item) in drop down list
-        :type idx: int
-        """
-        self.data_status = False
-        self.prev_alignments, self.histology_exists = self.loaddata.get_info(idx)
-        self.populate_lists(self.prev_alignments, self.align_list, self.align_combobox)
-        self.feature_prev, self.track_prev = self.loaddata.get_starting_alignment(0)
-
     def on_folder_selected(self):
         """
         Triggered in offline mode when folder button is clicked
@@ -1206,8 +1166,8 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         self.folder_line.setText(str(folder_path))
         self.prev_alignments, shank_options = self.loaddata.get_info(folder_path)
         self.populate_lists(shank_options, self.shank_list, self.shank_combobox)
-        self.populate_lists(self.prev_alignments, self.align_list, self.align_combobox)
         self.on_shank_selected(0)
+        self.data_button_pressed()
 
     def on_shank_selected(self, idx):
         """
@@ -1216,8 +1176,6 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         self.data_status = False
         self.current_shank_idx = idx
         # Update prev_alignments
-        self.prev_alignments = self.loaddata.get_previous_alignments(self.current_shank_idx)
-        self.populate_lists(self.prev_alignments, self.align_list, self.align_combobox)
         self.feature_prev, self.track_prev = self.loaddata.get_starting_alignment(0)
 
     def on_alignment_selected(self, idx):
@@ -1268,7 +1226,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
 
             self.region_fp, self.region_label_fp, self.region_colour_fp, _ \
                 = EphysAlignment.get_histology_regions(self.ephysalign.xyz_samples, self.ephysalign.sampling_trk,
-                                                       self.loaddata.franklin_atlas)
+                                                       self.loaddata.brain_atlas)
 
             self.features[self.idx], self.track[self.idx], self.xyz_track \
                 = self.ephysalign.get_track_and_feature()
@@ -1735,8 +1693,6 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         if upload == QtWidgets.QMessageBox.Yes:
             upload_channels = self.loaddata.upload_data(self.xyz_channels)
             self.loaddata.update_alignments(self.features[self.idx], self.track[self.idx])
-            self.prev_alignments = self.loaddata.get_previous_alignments()
-            self.populate_lists(self.prev_alignments, self.align_list, self.align_combobox)
             self.loaddata.get_starting_alignment(0)
             resolved = self.loaddata.update_qc()
 
@@ -1774,8 +1730,6 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         if upload == QtWidgets.QMessageBox.Yes:
             self.loaddata.upload_data(self.features[self.idx], self.track[self.idx],
                                       self.xyz_channels)
-            self.prev_alignments = self.loaddata.get_previous_alignments(self.current_shank_idx)
-            self.populate_lists(self.prev_alignments, self.align_list, self.align_combobox)
             self.loaddata.get_starting_alignment(0)
             QtWidgets.QMessageBox.information(self, 'Status', "Channels locations saved")
         else:
