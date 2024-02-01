@@ -1528,8 +1528,8 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
 
     def delete_line_button_pressed(self):
         """
-        Triggered when mouse hovers over reference line and Del key pressed. Deletes a reference
-        line from the ephys and histology plots
+        Triggered when mouse hovers over a reference line and shift+D keys are pressed. 
+        Deletes a reference line from the ephys and histology plots
         """
 
         if self.selected_line:
@@ -1694,8 +1694,8 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
 
     def complete_button_pressed_offline(self):
         """
-        Triggered when complete button or Shift+F key pressed. Uploads final channel locations to
-        json file
+        Triggered when save button or Shift+S keys are pressed. 
+        Saves final channel locations to a JSON file
         """
         if not self.loaddata.output_directory:
             if not self.on_output_folder_selected():

@@ -251,10 +251,12 @@ class Setup():
 
         # FIT OPTIONS MENU BAR
         # Define all possible keyboard shortcut interactions for GUI
+        
         # Shortcut to apply interpolation
         fit_option = QtWidgets.QAction('Fit', self)
         fit_option.setShortcut('Return')
         fit_option.triggered.connect(self.fit_button_pressed)
+        
         # Shortcuts to apply offset
         offset_option = QtWidgets.QAction('Offset', self)
         offset_option.setShortcut('O')
@@ -265,10 +267,12 @@ class Setup():
         movedown_option = QtWidgets.QAction('Offset - 50um', self)
         movedown_option.setShortcut('Shift+Down')
         movedown_option.triggered.connect(self.movedown_button_pressed)
-        # Shortcut to remove a reference line
-        delete_line_option = QtWidgets.QAction('Remove Line', self)
+        
+        # Shortcut to delete a reference line
+        delete_line_option = QtWidgets.QAction('Delete Line', self)
         delete_line_option.setShortcut('Shift+D')
         delete_line_option.triggered.connect(self.delete_line_button_pressed)
+        
         # Shortcut to move between previous/next moves
         next_option = QtWidgets.QAction('Next', self)
         next_option.setShortcut('Right')
@@ -276,13 +280,15 @@ class Setup():
         prev_option = QtWidgets.QAction('Previous', self)
         prev_option.setShortcut('Left')
         prev_option.triggered.connect(self.prev_button_pressed)
+
         # Shortcut to reset GUI to initial state
         reset_option = QtWidgets.QAction('Reset', self)
-        reset_option.setShortcut('Shift+R')
+        reset_option.setShortcut('Ctrl+R')
         reset_option.triggered.connect(self.reset_button_pressed)
-        # Shortcut to upload final state to Alyx/to local file
+        
+        # Shortcut to save final state to JSON file
         complete_option = QtWidgets.QAction('Save', self)
-        complete_option.setShortcut('Shift+U')
+        complete_option.setShortcut('Ctrl+S')
         if not self.offline:
             complete_option.triggered.connect(self.display_qc_options)
         else:
