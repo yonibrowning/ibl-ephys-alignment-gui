@@ -442,20 +442,6 @@ class Setup():
                 this_slice_action.triggered.connect(lambda checked, item=key: self.plot_slice(self.slice_data, item))
                 slice_options.addAction(this_slice_action)
                 self.slice_options_group.addAction(this_slice_action)
-        # slice_hist_rd = QtWidgets.QAction('Histology Red', self, checkable=True, checked=True)
-        # slice_hist_rd.triggered.connect(lambda: self.plot_slice(self.slice_data, 'hist_rd'))
-        # slice_hist_gr = QtWidgets.QAction('Histology Green', self, checkable=True, checked=False)
-        # slice_hist_gr.triggered.connect(lambda: self.plot_slice(self.slice_data, 'hist_gr'))
-
-
-
-
-       
-        # slice_options.addAction(slice_hist_rd)
-        # self.slice_options_group.addAction(slice_hist_rd)
-        # slice_options.addAction(slice_hist_gr)
-        # self.slice_options_group.addAction(slice_hist_gr)
-        
 
     def init_interaction_features(self):
         """

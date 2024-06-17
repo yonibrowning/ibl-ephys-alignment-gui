@@ -88,7 +88,6 @@ class EphysAlignment:
         tip_distance = _cumulative_distance(xyz_track)[1] + TIP_SIZE_UM / 1e6
         track_length = _cumulative_distance(xyz_track)[-1]
         track_extent = np.array([0, track_length]) - tip_distance
-
         return xyz_track, track_extent
 
     def get_track_and_feature(self):

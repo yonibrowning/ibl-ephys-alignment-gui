@@ -1247,6 +1247,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
             if not self.probe_path:
                 return
 
+
         # Only get histology specific stuff if the histology tracing exists
         if self.histology_exists:
             self.xyz_picks = self.loaddata.get_xyzpicks()
@@ -1480,7 +1481,6 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         if self.track[self.idx][-1] - 50 / 1e6 >= np.max(self.chn_depths) / 1e6:
             self.track[self.idx] -= 50 / 1e6
             self.offset_button_pressed()
-        print(self.track[self.idx])
 
 
     def moveup_button_pressed(self):
@@ -1494,7 +1494,6 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         if self.track[self.idx][0] + 50 / 1e6 <= np.min(self.chn_depths) / 1e6:
             self.track[self.idx] += 50 / 1e6
             self.offset_button_pressed()
-        print(self.track[self.idx])
 
     def toggle_labels_button_pressed(self):
         """

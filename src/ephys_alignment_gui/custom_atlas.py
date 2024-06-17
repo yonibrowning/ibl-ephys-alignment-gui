@@ -73,13 +73,11 @@ class CustomAllenAtlas(BrainAtlas):
             if not template_path.exists():
                 template_path = _download_atlas_allen(template_path)
 
-
-
             # get the remapped label volume
-            file_label = label_path.with_name(f'annotation_{res_um}.nrrd')
+            file_label = label_path/f'annotation_{res_um}.nrrd'
             if not file_label.exists():
                 file_label = _download_atlas_allen(file_label)
-            file_label_remap = label_path.with_name(f'annotation_{res_um}_lut_{LUT_VERSION}.npz')
+            file_label_remap = label_path.with_name/f'annotation_{res_um}_lut_{LUT_VERSION}.npz'
             if not file_label_remap.exists():
                 label = self._read_volume(file_label).astype(dtype=np.int32)
                 _logger.info("Computing brain atlas annotations lookup table")

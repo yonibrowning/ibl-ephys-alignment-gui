@@ -194,43 +194,11 @@ class LoadDataLocal:
                 
                 if hist_path:
                     # hist_atlas = atlas.AllenAtlas(hist_path=hist_path)        
-                    hist_atlas = CustomAllenAtlas(template_path=hist_path,label_path = self.atlas_path)
+                    hist_atlas = CustomAllenAtlas(template_path=hist_path,
+                                                  label_path = self.atlas_path)
                     hist_slice = hist_atlas.image[index[:, 0], :, index[:, 2]]
                     hist_slice = np.swapaxes(hist_slice, 0, 1)
                     slice_data[image.split('.nrrd')[0]] = hist_slice
-
-        # path_to_rd_image_nrrd = glob.glob(str(self.histology_path) + '/*RD.nrrd')
-        
-        # if path_to_rd_image_nrrd:
-        #     hist_path_rd = Path(path_to_rd_image_nrrd[0])
-        # else:
-        #     hist_path_rd = []
-
-        # path_to_gr_image_nrrd = glob.glob(str(self.histology_path) + '/*GR.nrrd')
-
-        # if path_to_gr_image_nrrd:
-        #     hist_path_gr = Path(path_to_gr_image_nrrd[0])
-        # else:
-        #     hist_path_gr = []
-
-        # if hist_path_rd:
-        #     hist_atlas_rd = atlas.AllenAtlas(hist_path=hist_path_rd)
-        #     hist_slice_rd = hist_atlas_rd.image[index[:, 0], :, index[:, 2]]
-        #     hist_slice_rd = np.swapaxes(hist_slice_rd, 0, 1)
-        # else:
-        #     print('Could not find red histology image for this subject')
-        #     print(f'Looked here: {hist_path_rd}')
-        #     hist_slice_rd = np.copy(ccf_slice)
-
-        # if hist_path_gr:
-        #     hist_atlas_gr = atlas.AllenAtlas(hist_path=hist_path_gr)
-        #     hist_slice_gr = hist_atlas_gr.image[index[:, 0], :, index[:, 2]]
-        #     hist_slice_gr = np.swapaxes(hist_slice_gr, 0, 1)
-        # else:
-        #     print('Could not find green histology image for this subject')
-        #     print(f'Looked here: {hist_path_gr}')
-        #     hist_slice_gr = np.copy(ccf_slice)
-
 
         return slice_data, None
 
