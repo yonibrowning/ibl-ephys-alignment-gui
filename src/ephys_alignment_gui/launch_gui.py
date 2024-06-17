@@ -1170,6 +1170,27 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
             return True
         else:
             return False
+    
+
+    def on_histology_folder_selected(self):
+        """
+        Triggered in offline mode when folder button is clicked
+        """
+        self.data_status = False
+        folder_path = Path(QtWidgets.QFileDialog.getExistingDirectory(None, "Select Histology Directory"))
+
+        if folder_path:
+            # self.histology_folder_line.setText(str(folder_path))
+            self.loaddata.histology_path = folder_path
+            if self.histology_exists:
+                self.slice_data, self.fp_slice_data = self.loaddata.get_slice_images(self.ephysalign.xyz_samples)
+            try:
+                self.data_button_pressed()
+            except TypeError:
+                pass
+            return True
+        else:
+            return False
 
     def on_output_folder_selected(self):
         """
@@ -1302,7 +1323,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
             self.create_lines(self.feature_prev[1:-1] * 1e6)
         # Initialise slice and fit images
         self.plot_fit()
-        self.plot_slice(self.slice_data, 'hist_rd')
+        self.plot_slice(self.slice_data, 'ccf')
 
         # Only configure the view the first time the GUI is launched
         self.set_view(view=1, configure=self.configure)
@@ -1459,6 +1480,8 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         if self.track[self.idx][-1] - 50 / 1e6 >= np.max(self.chn_depths) / 1e6:
             self.track[self.idx] -= 50 / 1e6
             self.offset_button_pressed()
+        print(self.track[self.idx])
+
 
     def moveup_button_pressed(self):
         """
@@ -1471,6 +1494,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         if self.track[self.idx][0] + 50 / 1e6 <= np.min(self.chn_depths) / 1e6:
             self.track[self.idx] += 50 / 1e6
             self.offset_button_pressed()
+        print(self.track[self.idx])
 
     def toggle_labels_button_pressed(self):
         """

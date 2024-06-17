@@ -180,47 +180,8 @@ class Setup():
             self.probe_options_group.addAction(probe)
 
         # SLICE PLOTS MENU BAR
-        # Define all coronal slice plot options
-        slice_hist_rd = QtWidgets.QAction('Histology Red', self, checkable=True, checked=True)
-        slice_hist_rd.triggered.connect(lambda: self.plot_slice(self.slice_data, 'hist_rd'))
-        slice_hist_gr = QtWidgets.QAction('Histology Green', self, checkable=True, checked=False)
-        slice_hist_gr.triggered.connect(lambda: self.plot_slice(self.slice_data, 'hist_gr'))
-        slice_ccf = QtWidgets.QAction('CCF', self, checkable=True, checked=False)
-        slice_ccf.triggered.connect(lambda: self.plot_slice(self.slice_data, 'ccf'))
-        slice_label = QtWidgets.QAction('Annotation', self, checkable=True, checked=False)
-        slice_label.triggered.connect(lambda: self.plot_slice(self.slice_data, 'label'))
+        self.init_slice_menu()
 
-        if self.fp_slice_data is not None:
-            fp_slice_label = QtWidgets.QAction('Annotation FP', self, checkable=True, checked=False)
-            fp_slice_label.triggered.connect(lambda: self.plot_slice(self.fp_slice_data, 'label'))
-
-        if not self.offline:
-            slice_hist_cb = QtWidgets.QAction('Histology cerebellar example', self, checkable=True, checked=False)
-            slice_hist_cb.triggered.connect(lambda: self.plot_slice(self.slice_data, 'hist_cb'))
-        # Initialise with raw histology image
-        self.slice_init = slice_hist_rd
-
-        # Add menu bar for slice plot
-
-        slice_options = menu_bar.addMenu("Slice Plots")
-        # Add action group so we can toggle through slice plot options
-        self.slice_options_group = QtWidgets.QActionGroup(slice_options)
-        self.slice_options_group.setExclusive(True)
-        slice_options.addAction(slice_hist_rd)
-        self.slice_options_group.addAction(slice_hist_rd)
-        slice_options.addAction(slice_hist_gr)
-        self.slice_options_group.addAction(slice_hist_gr)
-        slice_options.addAction(slice_ccf)
-        self.slice_options_group.addAction(slice_ccf)
-        slice_options.addAction(slice_label)
-        self.slice_options_group.addAction(slice_label)
-        if self.fp_slice_data is not None:
-            slice_options.addAction(fp_slice_label)
-            self.slice_options_group.addAction(fp_slice_label)
-
-        if not self.offline:
-            slice_options.addAction(slice_hist_cb)
-            self.slice_options_group.addAction(slice_hist_cb)
 
         # FILTER UNITS MENU BAR
         # Define unit filtering options
@@ -436,6 +397,66 @@ class Setup():
         # # Initialise with Allen mapping
         # self.mapping_init = allen_mapping
 
+    def init_slice_menu(self):
+        menu_bar = self.menuBar()
+        # Define all coronal slice plot options
+        # These are always present, regardless of histology alignment
+        slice_ccf = QtWidgets.QAction('CCF', self, checkable=True, checked=False)
+        slice_ccf.triggered.connect(lambda: self.plot_slice(self.slice_data, 'ccf'))
+        slice_label = QtWidgets.QAction('Annotation', self, checkable=True, checked=False)
+        slice_label.triggered.connect(lambda: self.plot_slice(self.slice_data, 'label'))
+        if self.fp_slice_data is not None:
+            fp_slice_label = QtWidgets.QAction('Annotation FP', self, checkable=True, checked=False)
+            fp_slice_label.triggered.connect(lambda: self.plot_slice(self.fp_slice_data, 'label'))
+        if not self.offline:
+            slice_hist_cb = QtWidgets.QAction('Histology cerebellar example', self, checkable=True, checked=False)
+            slice_hist_cb.triggered.connect(lambda: self.plot_slice(self.slice_data, 'hist_cb'))
+
+
+         # Add menu bar for slice plot
+        slice_options = menu_bar.addMenu("Slice Plots")
+        # Add action group so we can toggle through slice plot options
+        self.slice_options_group = QtWidgets.QActionGroup(slice_options)
+        self.slice_options_group.setExclusive(True)
+        slice_options.addAction(slice_ccf)
+        self.slice_options_group.addAction(slice_ccf)
+        slice_options.addAction(slice_label)
+        self.slice_options_group.addAction(slice_label)
+        if self.fp_slice_data is not None:
+            slice_options.addAction(fp_slice_label)
+            self.slice_options_group.addAction(fp_slice_label)
+
+        if not self.offline:
+            slice_options.addAction(slice_hist_cb)
+            self.slice_options_group.addAction(slice_hist_cb)
+
+        #Initialise with the CCF as the default slice plot.
+        self.slice_init = slice_ccf
+
+        # These are accessed sepperatly so have conditional activation
+        for key in self.slice_data.keys():
+            if key in ['ccf', 'label', 'scale', 'offset']:
+                continue
+            else:
+                this_slice_action = QtWidgets.QAction(key, self, checkable=True, checked=True)
+                this_slice_action.triggered.connect(lambda checked, item=key: self.plot_slice(self.slice_data, item))
+                slice_options.addAction(this_slice_action)
+                self.slice_options_group.addAction(this_slice_action)
+        # slice_hist_rd = QtWidgets.QAction('Histology Red', self, checkable=True, checked=True)
+        # slice_hist_rd.triggered.connect(lambda: self.plot_slice(self.slice_data, 'hist_rd'))
+        # slice_hist_gr = QtWidgets.QAction('Histology Green', self, checkable=True, checked=False)
+        # slice_hist_gr.triggered.connect(lambda: self.plot_slice(self.slice_data, 'hist_gr'))
+
+
+
+
+       
+        # slice_options.addAction(slice_hist_rd)
+        # self.slice_options_group.addAction(slice_hist_rd)
+        # slice_options.addAction(slice_hist_gr)
+        # self.slice_options_group.addAction(slice_hist_gr)
+        
+
     def init_interaction_features(self):
         """
         Create all interaction widgets that will be added to the GUI
@@ -492,6 +513,15 @@ class Setup():
             self.input_folder_button.setText('Input Directory')
             self.input_folder_button.clicked.connect(self.on_input_folder_selected)
 
+        # Button to load Histology 
+        self.histology_folder_button = QtWidgets.QToolButton()
+        self.histology_folder_button.setText('Load Histology')
+        self.histology_folder_button.clicked.connect(self.on_histology_folder_selected)
+        # self.histology_combo_box = QtWidgets.QComboBox()
+        # self.histology_list = QtGui.QStandardItemModel()
+        # self.histology_combo_box.setModel(self.histology_list)
+        # self.histology_combo_box.activated.connect(self.on_histology_selected)
+
         # Drop down list to select shank
         self.shank_list = QtGui.QStandardItemModel()
         self.shank_combobox = QtWidgets.QComboBox()
@@ -535,6 +565,11 @@ class Setup():
             self.interaction_layout3.addWidget(self.input_folder_button, stretch=1)
             self.interaction_layout3.addWidget(self.input_folder_line, stretch=2)
             self.interaction_layout3.addWidget(self.shank_combobox, stretch=1)
+
+        # # Group 3 -- Histology location
+        # self.interaction_layout3 = QtWidgets.QHBoxLayout()
+        self.interaction_layout3.addWidget(self.histology_folder_button, stretch=1)
+        # self.interaction_layout3.addWidget(self.histology_folder_line, stretch=2)
 
         # Pop up dialog for qc results to datajoint, only for online mode
         if not self.offline:

@@ -138,3 +138,6 @@ scratch/
 
 # pycharm
 .idea/*
+
+# Store atlas files locally to avoid download every time
+atlas_data/

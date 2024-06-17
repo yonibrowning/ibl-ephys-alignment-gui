@@ -13,16 +13,19 @@ def _cumulative_distance(xyz):
 class EphysAlignment:
 
     def __init__(self, xyz_picks, chn_depths=None, track_prev=None,
-                 feature_prev=None, brain_atlas=None, speedy=False):
+                 feature_prev=None, brain_atlas=None, speedy=False,):
 
         if not brain_atlas:
             self.brain_atlas = atlas.AllenAtlas(25)
         else:
             self.brain_atlas = brain_atlas
 
+        # Initial depth estimate.
+        # If not provided, end of track will be used.
+        self.chn_depths = chn_depths
+
         self.xyz_track, self.track_extent = self.get_insertion_track(xyz_picks, speedy=speedy)
 
-        self.chn_depths = chn_depths
         if np.any(track_prev):
             self.track_init = track_prev
             self.feature_init = feature_prev
@@ -33,6 +36,7 @@ class EphysAlignment:
 
         self.sampling_trk = np.arange(self.track_extent[0],
                                       self.track_extent[-1] - 10 * 1e-6, 10 * 1e-6)
+        
         self.xyz_samples = histology.interpolate_along_track(self.xyz_track,
                                                              self.sampling_trk -
                                                              self.sampling_trk[0])

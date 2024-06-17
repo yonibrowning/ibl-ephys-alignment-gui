@@ -11,6 +11,9 @@ from one import alf
 
 import iblatlas.atlas as atlas
 
+from custom_atlas import CustomAllenAtlas
+
+
 # temporarily add this in for neuropixel course 
 # until figured out fix to problem on win32
 import ssl
@@ -23,6 +26,8 @@ class LoadDataLocal:
         self.brain_atlas = None
         self.franklin_atlas = None
         self.folder_path = None
+        self.atlas_path = Path(__file__).parents[2].joinpath('atlas_data')    
+        self.histology_path = None
         self.chn_coords = None
         self.chn_coords_all = None
         self.sess_path = None
@@ -92,9 +97,9 @@ class LoadDataLocal:
         return shank_list
 
     def get_data(self):
-
-        self.brain_atlas = atlas.AllenAtlas(hist_path=self.folder_path)
-
+        
+        #self.brain_atlas = atlas.AllenAtlas(hist_path=self.atlas_path)
+        self.brain_atlas = CustomAllenAtlas(template_path=self.atlas_path,label_path = self.atlas_path)
         chn_x = np.unique(self.chn_coords_all[:, 0])
         if self.n_shanks > 1:
             shanks = {}
@@ -156,22 +161,8 @@ class LoadDataLocal:
         return xyz_picks
 
     def get_slice_images(self, xyz_channels):
-        # Load local slice images
-
-        path_to_rd_image_nrrd = glob.glob(str(self.folder_path) + '/*RD.nrrd')
         
-        if path_to_rd_image_nrrd:
-            hist_path_rd = Path(path_to_rd_image_nrrd[0])
-        else:
-            hist_path_rd = []
-
-        path_to_gr_image_nrrd = glob.glob(str(self.folder_path) + '/*GR.nrrd')
-
-        if path_to_gr_image_nrrd:
-            hist_path_gr = Path(path_to_gr_image_nrrd[0])
-        else:
-            hist_path_gr = []
-
+        # Load the CCF images
         index = self.brain_atlas.bc.xyz2i(xyz_channels)[:, self.brain_atlas.xyz2dims]
         ccf_slice = self.brain_atlas.image[index[:, 0], :, index[:, 2]]
         ccf_slice = np.swapaxes(ccf_slice, 0, 1)
@@ -183,31 +174,63 @@ class LoadDataLocal:
         width = [self.brain_atlas.bc.i2x(0), self.brain_atlas.bc.i2x(456)]
         height = [self.brain_atlas.bc.i2z(index[0, 2]), self.brain_atlas.bc.i2z(index[-1, 2])]
 
-        if hist_path_rd:
-            hist_atlas_rd = atlas.AllenAtlas(hist_path=hist_path_rd)
-            hist_slice_rd = hist_atlas_rd.image[index[:, 0], :, index[:, 2]]
-            hist_slice_rd = np.swapaxes(hist_slice_rd, 0, 1)
-        else:
-            print('Could not find red histology image for this subject')
-            hist_slice_rd = np.copy(ccf_slice)
-
-        if hist_path_gr:
-            hist_atlas_gr = atlas.AllenAtlas(hist_path=hist_path_gr)
-            hist_slice_gr = hist_atlas_gr.image[index[:, 0], :, index[:, 2]]
-            hist_slice_gr = np.swapaxes(hist_slice_gr, 0, 1)
-        else:
-            print('Could not find green histology image for this subject')
-            hist_slice_gr = np.copy(ccf_slice)
-
         slice_data = {
-            'hist_rd': hist_slice_rd,
-            'hist_gr': hist_slice_gr,
             'ccf': ccf_slice,
             'label': label_slice,
             'scale': np.array([(width[-1] - width[0]) / ccf_slice.shape[0],
                                (height[-1] - height[0]) / ccf_slice.shape[1]]),
             'offset': np.array([width[0], height[0]])
         }
+
+        # Load local slice images
+        if self.histology_path is not None:
+            histology_images = [ii.name for ii in list(Path(self.histology_path).iterdir()) if '.nrrd' in ii.name]
+            for image in histology_images:
+                path_to_image = glob.glob(str(self.histology_path) + f'/{image}')
+                if path_to_image:
+                    hist_path = Path(path_to_image[0])
+                else:
+                    hist_path = []
+                
+                if hist_path:
+                    # hist_atlas = atlas.AllenAtlas(hist_path=hist_path)        
+                    hist_atlas = CustomAllenAtlas(template_path=hist_path,label_path = self.atlas_path)
+                    hist_slice = hist_atlas.image[index[:, 0], :, index[:, 2]]
+                    hist_slice = np.swapaxes(hist_slice, 0, 1)
+                    slice_data[image.split('.nrrd')[0]] = hist_slice
+
+        # path_to_rd_image_nrrd = glob.glob(str(self.histology_path) + '/*RD.nrrd')
+        
+        # if path_to_rd_image_nrrd:
+        #     hist_path_rd = Path(path_to_rd_image_nrrd[0])
+        # else:
+        #     hist_path_rd = []
+
+        # path_to_gr_image_nrrd = glob.glob(str(self.histology_path) + '/*GR.nrrd')
+
+        # if path_to_gr_image_nrrd:
+        #     hist_path_gr = Path(path_to_gr_image_nrrd[0])
+        # else:
+        #     hist_path_gr = []
+
+        # if hist_path_rd:
+        #     hist_atlas_rd = atlas.AllenAtlas(hist_path=hist_path_rd)
+        #     hist_slice_rd = hist_atlas_rd.image[index[:, 0], :, index[:, 2]]
+        #     hist_slice_rd = np.swapaxes(hist_slice_rd, 0, 1)
+        # else:
+        #     print('Could not find red histology image for this subject')
+        #     print(f'Looked here: {hist_path_rd}')
+        #     hist_slice_rd = np.copy(ccf_slice)
+
+        # if hist_path_gr:
+        #     hist_atlas_gr = atlas.AllenAtlas(hist_path=hist_path_gr)
+        #     hist_slice_gr = hist_atlas_gr.image[index[:, 0], :, index[:, 2]]
+        #     hist_slice_gr = np.swapaxes(hist_slice_gr, 0, 1)
+        # else:
+        #     print('Could not find green histology image for this subject')
+        #     print(f'Looked here: {hist_path_gr}')
+        #     hist_slice_gr = np.copy(ccf_slice)
+
 
         return slice_data, None
 
