@@ -13,6 +13,9 @@ import nrrd
 
 import one.params
 import logging
+
+import SimpleITK as sitk
+
 _logger = logging.getLogger(__name__)
 
 
@@ -73,13 +76,16 @@ class CustomAllenAtlas(BrainAtlas):
             if not template_path.exists():
                 template_path = _download_atlas_allen(template_path)
 
-            # get the remapped label volume
-            file_label = label_path/f'annotation_{res_um}.nrrd'
-            if not file_label.exists():
-                file_label = _download_atlas_allen(file_label)
-            file_label_remap = label_path.with_name/f'annotation_{res_um}_lut_{LUT_VERSION}.npz'
+            # get the label volume
+            label_path = Path(label_path)
+            if not label_path.suffix:
+                label_path /= f'average_template_{res_um}.nrrd'
+            if not label_path.exists():
+                label_path = _download_atlas_allen(label_path)
+
+            file_label_remap = Path(label_path).parent/f'annotation_{res_um}_lut_{LUT_VERSION}.npz'
             if not file_label_remap.exists():
-                label = self._read_volume(file_label).astype(dtype=np.int32)
+                label = self._read_volume(file_label_remap).astype(dtype=np.int32)
                 _logger.info("Computing brain atlas annotations lookup table")
                 # lateralize atlas: for this the regions of the left hemisphere have primary
                 # keys opposite to to the normal ones
@@ -108,7 +114,6 @@ class CustomAllenAtlas(BrainAtlas):
             # loads the files
             label = self._read_volume(file_label_remap)
             image = self._read_volume(template_path)
-
         super().__init__(image, label, dxyz, regions, ibregma, dims2xyz=dims2xyz, xyz2dims=xyz2dims)
 
     @staticmethod
@@ -215,36 +220,56 @@ class CustomAllenAtlas(BrainAtlas):
                 self.regions.volume[np.unique(self.regions.hierarchy[:, i])] += count[i]
             self.regions.volume = self.regions.volume * (self.res_um / 1e3) ** 3       
 
+# This is a custom atlas class that inherits from BrainAtlas
+class CustomAtlas(BrainAtlas):
+    image = None
+    label = None
+    read_string = 'IRP' # Works, but not what it should be.
 
-# from iblatlas.atlas import BrainAtlas, BrainRegions
-# import SimpleITK as sitk
-# import numpy as np
+    def __init__(self,
+                 atlas_image_file =None,
+                 atlas_labels_file = None,
+                 bregma = None,
+                 force_um = None,
+                 scaling = np.array([1,1,1])):
+        self.atlas_image_file = atlas_image_file
+        self.atlas_labels_file = atlas_labels_file
+        if force_um is None:
+            dxyz = np.array(self.read_atlas_image())*np.array([1, -1, -1])*1e-6
+            self.res_um = dxyz[0]/1e-6
+        else:
+            _  = self.read_atlas_image()
+            self.res_um = force_um
+            dxyz = self.res_um * 1e-6 * np.array([1, -1, -1]) * scaling        
+        self.read_atlas_labels()
+        regions = BrainRegions()
+        #_, im = ismember(self.label, regions.id)
+        #label = np.reshape(im.astype(np.uint16), self.label.shape)
+        self.label[~np.isin(self.label,regions.id)]=997
+        self.label = self.label.astype(np.uint16)
 
-# # This is a custom atlas class that inherits from BrainAtlas
-# class CustomAtlas(BrainAtlas):
-#     image = None
-#     label = None
-#     def __init__(self,atlas_image_file =None,atlas_labels_file = None):
-#         self.atlas_image_file = atlas_image_file
-#         self.atlas_labels_file = atlas_labels_file
-#         dxyz = self.read_atlas_image()
-#         self.read_atlas_labels()
-#         regions = BrainRegions()
-#         xyz2dims = np.array([1, 0, 2])  # this is the c-contiguous ordering
-#         dims2xyz = np.array([1, 0, 2])
-#         super().__init__(self.image, self.label, dxyz, regions, [0,0,0], dims2xyz=dims2xyz, xyz2dims=xyz2dims)
+        
+        xyz2dims = np.array([1, 0, 2])  # this is the c-contiguous ordering
+        dims2xyz = np.array([1, 0, 2])
+        if bregma is None:
+            bregma = [0,0,0]
+        elif isinstance(bregma,str) and (bregma.lower() == 'allen'):
+            bregma = (ALLEN_CCF_LANDMARKS_MLAPDV_UM['bregma'] / self.res_um)
+        super().__init__(self.image, self.label, dxyz, regions, bregma, dims2xyz=dims2xyz, xyz2dims=xyz2dims)
+        self.label[~np.isin(self.label,regions.id)]=997
 
     
-#     def read_atlas_image(self):
-#         # Reads the 
-#         IMG = sitk.ReadImage(self.atlas_image_file)
-#         # Convert sitk to the (ap, ml, dv) np array needed by BrainAtlas
-#         IMG2 = sitk.DICOMOrient(IMG,'IRP') 
-#         self.image = sitk.GetArrayViewFromImage(IMG2)
-#         return IMG2.GetSpacing()
+    def read_atlas_image(self):
+        # Reads the 
+        IMG = sitk.ReadImage(self.atlas_image_file)
+        # Convert sitk to the (ap, ml, dv) np array needed by BrainAtlas
+        IMG2 = sitk.DICOMOrient(IMG,self.read_string) 
+        self.image = sitk.GetArrayFromImage(IMG2)
+        self.offset = IMG2.GetOrigin()
+        return IMG2.GetSpacing()
         
-#     def read_atlas_labels(self):
-#         IMG = sitk.ReadImage(self.atlas_labels_file)
-#         # Convert sitk to the (ap, ml, dv) np array needed by BrainAtlas
-#         IMG2 = sitk.DICOMOrient(IMG,'IRP')
-#         self.label = sitk.GetArrayViewFromImage(IMG2)
+    def read_atlas_labels(self):
+        IMG = sitk.ReadImage(self.atlas_labels_file)
+        # Convert sitk to the (ap, ml, dv) np array needed by BrainAtlas
+        IMG2 = sitk.DICOMOrient(IMG,self.read_string)
+        self.label = sitk.GetArrayFromImage(IMG2).astype(np.int32)
