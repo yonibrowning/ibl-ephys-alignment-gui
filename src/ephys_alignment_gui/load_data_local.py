@@ -110,14 +110,14 @@ class LoadDataLocal:
     def get_data(self):
 
         # self.brain_atlas = atlas.AllenAtlas(hist_path=self.atlas_path)
-        # self.brain_atlas = CustomAllenAtlas(
-        #    template_path=self.atlas_path, label_path=self.atlas_path
-        # )
-        self.brain_atlas = CustomAtlas(
-           atlas_image_file=r'D:\IBL-GUI-Histospace-Test-data\Histology\prep_percNorm_Ex_561_Em_593.nii.gz',#ccf_in_713506.nrrd',
-           atlas_labels_file=r'D:\IBL-GUI-Histospace-Test-data\Histology\labels_in_713506.nrrd',
-           force_um = 25,
+        self.brain_atlas = CustomAllenAtlas(
+           template_path=self.atlas_path, label_path=self.atlas_path
         )
+        # self.brain_atlas = CustomAtlas(
+        #    atlas_image_file=r'D:\IBL-GUI-Histospace-Test-data\Histology\prep_percNorm_Ex_561_Em_593.nii.gz',#ccf_in_713506.nrrd',
+        #    atlas_labels_file=r'D:\IBL-GUI-Histospace-Test-data\Histology\labels_in_713506.nrrd',
+        #    force_um = 25,
+        # )
 
         chn_x = np.unique(self.chn_coords_all[:, 0])
         if self.n_shanks > 1:
@@ -201,11 +201,6 @@ class LoadDataLocal:
             user_picks = json.load(f)
 
         xyz_picks = np.array(user_picks["xyz_picks"]) / 1e6
-
-        # This is a hack and will be fixed in the future!
-        xyz_picks[:,1] = -xyz_picks[:,1]-1500e-6
-        xyz_picks[:,2]= xyz_picks[:,2]-1500e-6
-        xyz_picks[:,0] = 406*25e-6-xyz_picks[:,0]-1500e-6
 
         print(xyz_picks)
         return xyz_picks
