@@ -11,7 +11,7 @@ from one import alf
 
 import iblatlas.atlas as atlas
 
-from .custom_atlas import CustomAllenAtlas,CustomAtlas
+from .custom_atlas import CustomAllenAtlas
 
 
 # temporarily add this in for neuropixel course
@@ -113,11 +113,6 @@ class LoadDataLocal:
         self.brain_atlas = CustomAllenAtlas(
            template_path=self.atlas_path, label_path=self.atlas_path
         )
-        # self.brain_atlas = CustomAtlas(
-        #    atlas_image_file=r'D:\IBL-GUI-Histospace-Test-data\Histology\prep_percNorm_Ex_561_Em_593.nii.gz',#ccf_in_713506.nrrd',
-        #    atlas_labels_file=r'D:\IBL-GUI-Histospace-Test-data\Histology\labels_in_713506.nrrd',
-        #    force_um = 25,
-        # )
 
         chn_x = np.unique(self.chn_coords_all[:, 0])
         if self.n_shanks > 1:
