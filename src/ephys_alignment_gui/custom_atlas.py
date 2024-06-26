@@ -86,7 +86,7 @@ class CustomAllenAtlas(BrainAtlas):
 
             file_label_remap = Path(label_path).parent/f'annotation_{res_um}_lut_{LUT_VERSION}.npz'
             if not file_label_remap.exists():
-                label = self._read_volume(file_label_remap).astype(dtype=np.int32)
+                label = self._read_volume(label_path).astype(dtype=np.int32)
                 _logger.info("Computing brain atlas annotations lookup table")
                 # lateralize atlas: for this the regions of the left hemisphere have primary
                 # keys opposite to to the normal ones
