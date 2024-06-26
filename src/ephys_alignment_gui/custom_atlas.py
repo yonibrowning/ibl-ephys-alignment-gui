@@ -80,6 +80,7 @@ class CustomAllenAtlas(BrainAtlas):
             label_path = Path(label_path)
             if not label_path.suffix:
                 label_path /= f'average_template_{res_um}.nrrd'
+            print(label_path)
             if not label_path.exists():
                 label_path = _download_atlas_allen(label_path)
 
