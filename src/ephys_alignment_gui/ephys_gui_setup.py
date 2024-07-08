@@ -170,6 +170,7 @@ class Setup():
                                     self.probe_lfp_data[item]))
             probe_options.addAction(probe)
             self.probe_options_group.addAction(probe)
+        
 
         sub_types = list(self.probe_rfmap.keys())
         for sub in sub_types:

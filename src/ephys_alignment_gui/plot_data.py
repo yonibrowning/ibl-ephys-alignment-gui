@@ -242,7 +242,7 @@ class PlotData:
                 'img': img,
                 'scale': np.array([xscale, yscale]),
                 'levels': np.quantile(np.mean(img, axis=0), [0, 1]),
-                'offset': np.array([0, self.chn_min]),
+                'offset': np.array([0, np.min(depths)]),
                 'xrange': np.array([times[0], times[-1]]),
                 'xaxis': 'Time (s)',
                 'cmap': 'binary',

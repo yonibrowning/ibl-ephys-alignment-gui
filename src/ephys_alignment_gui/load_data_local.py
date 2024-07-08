@@ -196,8 +196,6 @@ class LoadDataLocal:
             user_picks = json.load(f)
 
         xyz_picks = np.array(user_picks["xyz_picks"]) / 1e6
-
-        print(xyz_picks)
         return xyz_picks
 
     def get_slice_images(self, xyz_channels):
