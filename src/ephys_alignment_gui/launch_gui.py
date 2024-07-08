@@ -1332,7 +1332,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
 
         # Initialise ephys plots
         self.plot_image(self.img_fr_data)
-        self.plot_probe(self.probe_rms_APdata)
+        self.plot_probe(self.probe_rms_LFPdata)
         self.plot_line(self.line_fr_data)
 
         # Initialise histology plots
@@ -1409,7 +1409,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         self.line_init.setChecked(True)
         self.probe_init.setChecked(True)
         self.plot_image(self.img_fr_data)
-        self.plot_probe(self.probe_rms_APdata)
+        self.plot_probe(self.probe_rms_LFPdata)
         self.plot_line(self.line_fr_data)
 
     def fit_button_pressed(self):

@@ -147,8 +147,8 @@ class Setup():
         probe_rmsLFP = QtWidgets.QAction('RMS LFP', self, checkable=True, checked=False)
         probe_rmsLFP.triggered.connect(lambda: self.plot_probe(self.probe_rms_LFPdata))
 
-        # Initialise with rms of AP probe plot
-        self.probe_init = probe_rmsAP
+        # Initialise with rms of LFP probe plot
+        self.probe_init = probe_rmsLFP
 
         # Add menu bar for 2D probe plot options
         probe_options = menu_bar.addMenu("Probe Plots")

@@ -313,7 +313,7 @@ class PlotData:
                 'img': corr,
                 'scale': np.array([scale, scale]),
                 'levels': np.array([np.min(corr), np.max(corr)]),
-                'offset': np.array([self.chn_min, self.chn_min]),
+                'offset': np.array([np.min(depths), np.min(depths)]),
                 'xrange': np.array([self.chn_min, self.chn_max]),
                 'cmap': 'viridis',
                 'title': 'Correlation',
