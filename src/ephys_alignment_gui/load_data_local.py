@@ -3,6 +3,7 @@ import numpy as np
 from datetime import datetime
 
 from pathlib import Path
+import os
 import glob
 import json
 
@@ -313,7 +314,8 @@ class LoadDataLocal:
             if self.n_shanks == 1
             else f"channel_locations_shank{self.shank_idx + 1}.json"
         )
-
+        
+        os.makedirs(self.output_directory, exist_ok=True)
         with open(self.output_directory.joinpath(chan_loc_filename), "w") as f:
             json.dump(channel_dict, f, indent=2, separators=(",", ": "))
         original_json = self.alignments
