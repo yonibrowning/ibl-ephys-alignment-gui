@@ -1162,7 +1162,7 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         if Path('/data/').is_dir():
             # Default For code ocean.
             we_are_in_code_ocean = True
-            Path(QtWidgets.QFileDialog.getExistingDirectory('/data/', "Select Input Directory"))
+            folder_path = Path(QtWidgets.QFileDialog.getExistingDirectory(None, "Select Input Directory",'/data/'))
         else:
             # If not code ocean, will default to current directory
             we_are_in_code_ocean = False
