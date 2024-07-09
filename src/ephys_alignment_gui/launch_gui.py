@@ -1171,10 +1171,9 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
         # Set the output default based on the selected folder path
         if we_are_in_code_ocean:
             out_folder = Path('/results/').joinpath(folder_path.parent.stem)
-            
         else:
             out_folder = folder_path.parent/'out'
-        
+
         # Create the output folder if it doesn't exist
         os.makedirs(out_folder, exist_ok=True)
         # Set the output directory based on input name.
@@ -1187,7 +1186,16 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
             self.prev_alignments, shank_options = self.loaddata.get_info(folder_path)
             self.populate_lists(shank_options, self.shank_list, self.shank_combobox)
             self.on_shank_selected(0)
+
+            # IF a histology folder matching a specific pattern exists, set the
+            # histology path
+            hist_folder = folder_path.parent.joinpath('histology')
+            if hist_folder.is_dir():
+                self.loaddata.histology_path = hist_folder
+            else:
+                print('Histology folder not found. Please select.')
             self.data_button_pressed()
+
             return True
         else:
             return False
@@ -1212,6 +1220,8 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
             return True
         else:
             return False
+        
+
 
     def on_output_folder_selected(self):
         """
@@ -1225,7 +1235,16 @@ class MainWindow(QtWidgets.QMainWindow, ephys_gui.Setup):
             return True
         else:
             return False
+        
+    # def on_load_existing_button_pressed(self):
+    #     if self.loaddata.output_directory is not None:
+    #         folder_path = Path(QtWidgets.QFileDialog.getExistingDirectory(None, "Select Annotation Directory"),self.loaddata.output_directory)
+    #     else:
+    #         folder_path = Path(QtWidgets.QFileDialog.getExistingDirectory(None, "Select Annotation Directory"))
+    #     self.prev_alignments, shank_options = self.loaddata.get_previous_info(folder_path)
+    #     self.populate_lists(shank_options, self.shank_list, self.shank_combobox)
 
+        
     def on_shank_selected(self, idx):
         """
         Triggered in offline mode for selecting shank when using NP2.0

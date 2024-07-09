@@ -35,6 +35,7 @@ class LoadDataLocal:
         self.shank_idx = 0
         self.n_shanks = 1
         self.output_directory = None
+        self.previous_directory = None
 
     def get_info(self, folder_path):
         """
@@ -45,7 +46,18 @@ class LoadDataLocal:
         prev_aligns = self.get_previous_alignments()
         return prev_aligns, shank_list
 
-    def get_previous_alignments(self, shank_idx=0):
+
+    def get_previous_info(self, folder_path):
+        """
+        Read in the local json file to see if any previous alignments exist
+        """
+        shank_list = self.get_nshanks()
+        prev_aligns = self.get_previous_alignments(folder_path=folder_path)
+        return prev_aligns, shank_list
+
+    def get_previous_alignments(self, shank_idx=0,folder_path = None):
+        if folder_path is None:
+            folder_path = self.folder_path
 
         self.shank_idx = shank_idx
         # If previous alignment json file exists, read in previous alignments

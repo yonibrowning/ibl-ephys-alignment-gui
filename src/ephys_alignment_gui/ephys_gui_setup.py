@@ -504,10 +504,10 @@ class Setup():
         self.histology_folder_button = QtWidgets.QToolButton()
         self.histology_folder_button.setText('Load Histology')
         self.histology_folder_button.clicked.connect(self.on_histology_folder_selected)
-        # self.histology_combo_box = QtWidgets.QComboBox()
-        # self.histology_list = QtGui.QStandardItemModel()
-        # self.histology_combo_box.setModel(self.histology_list)
-        # self.histology_combo_box.activated.connect(self.on_histology_selected)
+
+        #self.load_existing_button = QtWidgets.QPushButton('Load Existing')
+        #self.load_existing_button.clicked.connect(self.on_load_existing_button_pressed)
+
 
         # Drop down list to select shank
         self.shank_list = QtGui.QStandardItemModel()
@@ -556,7 +556,7 @@ class Setup():
         # # Group 3 -- Histology location
         # self.interaction_layout3 = QtWidgets.QHBoxLayout()
         self.interaction_layout3.addWidget(self.histology_folder_button, stretch=1)
-        # self.interaction_layout3.addWidget(self.histology_folder_line, stretch=2)
+        #self.interaction_layout3.addWidget(self.load_existing_button, stretch=1)
 
         # Pop up dialog for qc results to datajoint, only for online mode
         if not self.offline:
